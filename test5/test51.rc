@@ -63,7 +63,7 @@ IDR_WAVE2               WAVE                    "finish.wav"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "C:\\Users\\zipzi\\source\\learning\\test5\\test5\\icon1.ico"
+IDI_ICON1               ICON                    "icon1.ico"
 
 #endif    // Hungarian (Hungary) resources
 /////////////////////////////////////////////////////////////////////////////
