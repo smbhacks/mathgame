@@ -1,6 +1,28 @@
 #include <iostream>
 #include <windows.h>
+#include <stdlib.h>
+#include <string>
+#include <sstream>
 #include "log.h"
+
+//Taken from https://stackoverflow.com/questions/32140018/why-is-this-program-giving-an-error-to-string-is-not-a-member-of-std-why
+//for some reason to_string() doesn't work for me
+std::string Log::toString(int value) {
+	std::ostringstream os;
+	os << value;
+	return os.str();
+}
+
+unsigned int Log::GetValue(int& x)
+{
+	std::cin >> x;
+	return x - 1;
+}
+
+void Log::LogClear()
+{
+	system("CLS");
+}
 
 wchar_t* Log::convertCharArrayToLPCWSTR(const char* charArray)
 {
@@ -13,6 +35,34 @@ void Log::SetLogTitle(const char* string)
 {
 	m_LogTitle = string;
 	SetConsoleTitle(convertCharArrayToLPCWSTR(string));
+}
+
+void Log::LogCharacter(char character, int size, unsigned int level, bool newline)
+{
+	if (m_LogLevel <= level)
+	{
+		//set color
+		switch (level)
+		{
+		case 0:
+			std::cout << "\x1B[36m";
+			break;
+		case 1:
+			std::cout << "\x1B[33m";
+			break;
+		case 2:
+			std::cout << "\x1B[31m";
+			break;
+		case 3:
+			std::cout << "\x1B[37m";
+			break;
+		}
+		for (int i = size; i > 0; i--)
+		{
+			std::cout << character;
+		}
+		if (newline == true) std::cout << std::endl;
+	}
 }
 
 bool Log::SetLogLevel(unsigned int level)

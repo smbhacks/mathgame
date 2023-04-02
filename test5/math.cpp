@@ -3,25 +3,36 @@
 #include <random>
 
 //public
-int math::GetDifficulty()
+void math::DisplayScore(Log& log)
 {
-	int x; std::cin >> x;
-	switch (x)
-	{
-	case 1:
-		difficulty = 2;
-		break;
-	case 2:
-		difficulty = 3;
-		break;
-	case 3:
-		difficulty = 6;
-	default:
-		break;
-	}
-	return difficulty;
+	log.LogToConsole("Your score: ", log.LOGMESSAGE, false);
+	if (score < 0) score = 0;
+	std::cout << score << std::endl;
 }
 
+void math::GetDifficulty(int range, Log& log)
+{
+	std::string string = "Enter difficulty (1~";
+	string += char_numbers[range];
+	string += "): ";
+	const char* c = string.c_str();
+	log.LogToConsole(c, log.LOGMESSAGE, false);
+	int& option = difficulty;
+	while (log.GetValue(option) > range-1)
+	{
+		log.LogToConsole("Invalid difficulty!", log.LOGERROR, true);
+		log.LogToConsole(c, log.LOGMESSAGE, false);
+	}
+}
+
+void math::InitVars()
+{
+	lives = 3;
+	score = 0;
+	difficulty = 0;
+}
+
+//GM1
 void math::GetRandomNumbers(int* numbers, int* signs, int random_size)
 {
 	for (int i = 0; i < random_size; i++)
@@ -48,7 +59,7 @@ void math::OutputQuestion(Log& log, int* numbers, int* signs, int size)
 	log.LogToConsole(c, log.LOGMESSAGE, false);
 }
 
-bool math::GetAnswer(Log& log, int* numbers, int* signs, int size)
+bool math::GetAnswerGM1(Log& log, int* numbers, int* signs, int size)
 {
 	if (GetInput()==CalculateAnswer(numbers, signs, size))
 	{
@@ -91,6 +102,54 @@ int math::CalculateAnswer(int* numbers, int* signs, int size)
 		}
 	}
 	return numbers[size-1];
+}
+
+//GM2
+void math::GetPythagorean()
+{
+	//change rand() here for difficulty setting
+	py_id = rand() % (4 * difficulty);
+	sides[0] = pya[py_id];
+	sides[1] = pyb[py_id];
+	sides[2] = pyc[py_id];
+}
+
+void math::OutputPythagorean(Log& log)
+{
+	//get a random missing_side var
+	//make sides[2] the missing side
+	if (sqrt(pow(sides[0], 2) + pow(sides[1], 2)) != sides[2]) log.LogToConsole("The solution for this doesn't match with the expected value. Please report this!", log.LOGERROR, true);
+	int missing_side = rand() % 3;
+	if (missing_side != 2)
+	{
+		int solution = sides[missing_side];
+		sides[missing_side] = sides[2];
+		sides[2] = solution;
+	}
+	//make string
+	std::string string = "";
+	int i = rand();
+	string += log.toString(sides[i%2]);
+	string += ' ';
+	string += log.toString(sides[(i+1)%2]);
+	string += ' ';
+	const char* c = string.c_str();
+	log.LogToConsole(c, log.LOGMESSAGE, false);
+}
+
+bool math::GetAnswerGM2(Log& log)
+{
+	if (GetInput() == sides[2])
+	{
+		log.LogToConsole("Correct Answer!", log.LOGINFO, true);
+		return true;
+	}
+	else
+	{
+		log.LogToConsole("Incorrect Answer!", log.LOGERROR, true);
+		lives--;
+		return false;
+	}
 }
 
 //private
