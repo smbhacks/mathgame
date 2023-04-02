@@ -76,3 +76,9 @@ void Log::EndOfProgram()
 	LogToConsole("You can now exit the program...", LOGMESSAGE, false);
 	std::cin >> m_LogLevel;
 }
+
+Log::Log(unsigned int level)
+{
+	//Set init log level
+	SetLogLevel(level);
+}

@@ -3,30 +3,54 @@
 #include <random>
 
 //public
-void math::GetRandomNumbers()
+int math::GetDifficulty()
 {
-	for (int i = 2; i > -1; i--)
+	int x; std::cin >> x;
+	switch (x)
+	{
+	case 1:
+		difficulty = 2;
+		break;
+	case 2:
+		difficulty = 3;
+		break;
+	case 3:
+		difficulty = 6;
+	default:
+		break;
+	}
+	return difficulty;
+}
+
+void math::GetRandomNumbers(int* numbers, int* signs, int random_size)
+{
+	for (int i = 0; i < random_size; i++)
 	{
 		numbers[i] = rand() % 9 + 1;
+		//signs[0] is not going to be read!
 		signs[i] = rand() % 3;
 	}
 }
 
-void math::OutputQuestion(Log& log)
-{
-	std::string question = "a x b y c = ";
-	question[question.find('x')] = char_signs[signs[0]];
-	question[question.find('y')] = char_signs[signs[1]];
-	question[question.find('a')] = char_numbers[numbers[0]];
-	question[question.find('b')] = char_numbers[numbers[1]];
-	question[question.find('c')] = char_numbers[numbers[2]];
+void math::OutputQuestion(Log& log, int* numbers, int* signs, int size)
+{;
+	std::string question;
+	question += char_numbers[numbers[0]];
+	for (int i = 1; i < size; i++)
+	{
+		question += ' ';
+		question += char_signs[signs[i]];
+		question += ' ';
+		question += char_numbers[numbers[i]];
+	}
+	question += " = ";
 	const char* c = question.c_str();
 	log.LogToConsole(c, log.LOGMESSAGE, false);
 }
 
-bool math::GetAnswer(Log& log)
+bool math::GetAnswer(Log& log, int* numbers, int* signs, int size)
 {
-	if (GetInput()==CalculateAnswer())
+	if (GetInput()==CalculateAnswer(numbers, signs, size))
 	{
 		log.LogToConsole("Correct Answer!", log.LOGINFO, true);
 		return true;
@@ -39,32 +63,39 @@ bool math::GetAnswer(Log& log)
 	}
 }
 
+int math::CalculateAnswer(int* numbers, int* signs, int size)
+{
+	//Check multiplications first
+	for (int i = size-1; i > 0; i--)
+	{
+		if (signs[i] == MULTIPLICATION_SIGN)
+		{
+			numbers[i-1] *= numbers[i];
+			numbers[i] = 1;
+		}
+	}
+	//Handle new equation from left to right
+	for (int i = 1; i < size; i++)
+	{
+		switch (signs[i])
+		{
+		case ADDITION_SIGN:
+			numbers[i] += numbers[i - 1];
+			break;
+		case SUBSTRACTION_SIGN:
+			numbers[i] = numbers[i-1] - numbers[i];
+			break;
+		case MULTIPLICATION_SIGN:
+			numbers[i] *= numbers[i - 1];
+			break;
+		}
+	}
+	return numbers[size-1];
+}
+
 //private
 int math::GetInput()
 {
 	int x; std::cin >> x;
 	return x;
-}
-
-int math::CalculateAnswer()
-{
-	if (signs[1] >= MULTIPLICATION_SIGN)
-	{
-		numbers[1] *= numbers[2];
-		numbers[2] = 1;
-	}
-	for (int i = 0; i < 2; i++)
-		switch (signs[i])
-		{
-		case ADDITION_SIGN:
-			numbers[i + 1] += numbers[i];
-			break;
-		case SUBSTRACTION_SIGN:
-			numbers[i + 1] = numbers[i] - numbers[i + 1];
-			break;
-		case MULTIPLICATION_SIGN:
-			numbers[i + 1] *= numbers[i];
-			break;
-		}
-	return numbers[2];
 }

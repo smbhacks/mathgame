@@ -11,6 +11,7 @@ private:
 	int m_LogLevel = LOGINFO;
 	std::string m_LogTitle;
 public:
+	Log(unsigned int level);
 	void SetLogTitle(const char* string);
 	bool SetLogLevel(unsigned int level);
 	void LogToConsole(const char* message, int level, bool NewLine);
